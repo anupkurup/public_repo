@@ -1,0 +1,45 @@
+spring:
+  kafka:
+    bootstrap-servers: ${spring.embedded.kafka.brokers}
+  properties:
+    schema.registry-url: mock://schema-registry-url  
+    security.protocol: PLAINTEXT
+
+spring.cloud.stream:
+  function.definition: processUsersStream,processDevicesStream,processHmacsStream,processPe11CustomersStream
+  # Kafka config
+  kafka.streams.binder:
+    applicationId: tsb-cb-cdc-customer-write-topology
+    autoCreateTopics: false
+    configuration:
+      schema.registry.url: mock://schema-registry-url  
+      default:
+        key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+        value.serde: com.tsb.cb.common.ITestBase$DummySpecificAvroSerde
+      security.protocol: PLAINTEXT
+
+  # topics
+  bindings:
+    processUsersStream-in-0.destination: com.tsb.private.cb.users_by_user_id
+    processDevicesStream-in-0.destination: com.tsb.private.cb.tbbv_bs_enrollments
+    processHmacsStream-in-0.destination: com.tsb.cb.customer.write.hmac.public.request
+    processPe11CustomersStream-in-0.destination: com.tsb.private.cb.pe11.customers
+
+  # schema registry
+  schemaRegistryClient.endpoint: http://fake:8081
+
+# Database
+spring.data.cassandra.keyspace-name: testKeyspace
+spring.data.cassandra.username: cassandra
+spring.data.cassandra.password: cassandra
+spring.data.cassandra.schema-action: NONE
+
+# Monitoring
+management:
+  server.port: 0
+
+# Logging
+logging.level:
+  root: INFO
+  com.tsb.cb: INFO
+
